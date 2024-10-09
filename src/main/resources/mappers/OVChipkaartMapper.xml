@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OVChipkaart.OVChipkaartMapper">
+
+    <resultMap id="OVChipkaartResult" type="OVChipkaart.OVChipkaart">
+        <id property="kaartNummer" column="kaart_nummer" />
+        <result property="geldigTot" column="geldig_tot" />
+        <result property="klasse" column="klasse" />
+        <result property="saldo" column="saldo" />
+        <association property="reiziger" column="reiziger_id" select="Reiziger.ReizigerMapper.findById"/>
+        <collection property="producten" ofType="Product.Product" select="Product.ProductMapper.findByOVChipkaart" column="kaart_nummer"/>
+    </resultMap>
+
+    <insert id="save" parameterType="OVChipkaart.OVChipkaart">
+        INSERT INTO ov_chipkaart (kaart_nummer, geldig_tot, klasse, saldo, reiziger_id)
+        VALUES (#{kaartNummer}, #{geldigTot}, #{klasse}, #{saldo}, #{reiziger.id});
+    </insert>
+
+    <update id="update" parameterType="OVChipkaart.OVChipkaart">
+        UPDATE ov_chipkaart
+        SET geldig_tot = #{geldigTot},
+        klasse = #{klasse},
+        saldo = #{saldo},
+        reiziger_id = #{reiziger.id}
+        WHERE kaart_nummer = #{kaartNummer};
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM ov_chipkaart WHERE kaart_nummer = #{kaartNummer};
+    </delete>
+
+    <select id="findById" parameterType="int" resultMap="OVChipkaartResult">
+        SELECT * FROM ov_chipkaart WHERE kaart_nummer = #{kaartNummer};
+    </select>
+
+    <select id="findByReiziger" parameterType="Reiziger.Reiziger" resultMap="OVChipkaartResult">
+        SELECT * FROM ov_chipkaart WHERE reiziger_id = #{id};
+    </select>
+
+    <select id="findAll" resultMap="OVChipkaartResult">
+        SELECT * FROM ov_chipkaart;
+    </select>
+
+</mapper>
