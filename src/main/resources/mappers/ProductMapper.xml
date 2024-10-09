@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Product.ProductMapper">
+
+    <insert id="save" parameterType="Product.Product">
+        INSERT INTO product (product_nummer, naam, beschrijving, prijs)
+        VALUES (#{product_nummer}, #{naam}, #{beschrijving}, #{prijs});
+    </insert>
+
+    <update id="update" parameterType="Product.Product">
+        UPDATE product
+        SET naam = #{naam},
+            beschrijving = #{beschrijving},
+            prijs = #{prijs}
+        WHERE product_nummer = #{product_nummer};
+    </update>
+
+    <delete id="delete" parameterType="Product.Product">
+        DELETE FROM product
+        WHERE product_nummer = #{product_nummer};
+    </delete>
+
+    <select id="findByOVChipkaart" resultType="Product.Product">
+        SELECT p.*
+        FROM product p
+                 JOIN ov_chipkaart_product oc ON p.product_nummer = oc.product_nummer
+        WHERE oc.kaart_nummer = #{kaartNummer}
+    </select>
+
+    <select id="findAll" resultType="Product.Product">
+        SELECT * FROM product;
+    </select>
+</mapper>
+
