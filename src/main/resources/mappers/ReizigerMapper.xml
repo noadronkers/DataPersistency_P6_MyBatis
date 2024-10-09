@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Reiziger.ReizigerMapper">
+
+    <resultMap id="ReizigerWithAdresAndOVChipkaartResultMap" type="Reiziger.Reiziger">
+        <id property="id" column="id"/>
+        <result property="voorletters" column="voorletters"/>
+        <result property="tussenvoegsel" column="tussenvoegsel"/>
+        <result property="achternaam" column="achternaam"/>
+        <result property="geboortedatum" column="geboortedatum"/>
+
+        <association property="adres" javaType="Adres.Adres">
+            <id property="id" column="adres_id"/>
+            <result property="straat" column="straat"/>
+            <result property="huisnummer" column="huisnummer"/>
+            <result property="postcode" column="postcode"/>
+            <result property="woonplaats" column="woonplaats"/>
+        </association>
+
+        <collection property="ovChipkaarten" ofType="OVChipkaart.OVChipkaart">
+            <id property="kaartNummer" column="kaart_nummer"/>
+            <result property="geldigTot" column="geldig_tot"/>
+            <result property="klasse" column="klasse"/>
+            <result property="saldo" column="saldo"/>
+        </collection>
+    </resultMap>
+
+    <insert id="save" parameterType="Reiziger.Reiziger">
+        INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum)
+        VALUES (#{id}, #{voorletters}, #{tussenvoegsel}, #{achternaam}, #{geboortedatum});
+    </insert>
+
+    <update id="update" parameterType="Reiziger.Reiziger">
+        UPDATE reiziger
+        SET voorletters = #{voorletters},
+            tussenvoegsel = #{tussenvoegsel},
+            achternaam = #{achternaam},
+            geboortedatum = #{geboortedatum}
+        WHERE reiziger_id = #{id};
+    </update>
+
+    <delete id="delete" parameterType="Reiziger.Reiziger">
+        DELETE FROM reiziger WHERE reiziger_id = #{id};
+    </delete>
+
+    <select id="findById" parameterType="int" resultMap="ReizigerWithAdresAndOVChipkaartResultMap">
+        SELECT r.reiziger_id AS id,
+               r.voorletters,
+               r.tussenvoegsel,
+               r.achternaam,
+               r.geboortedatum,
+               a.adres_id AS adres_id,
+               a.postcode,
+               a.huisnummer,
+               a.straat,
+               a.woonplaats,
+               o.kaart_nummer AS kaart_nummer,
+               o.geldig_tot AS geldig_tot,
+               o.klasse AS klasse,
+               o.saldo AS saldo,
+               o.reiziger_id AS reiziger_id
+        FROM reiziger r
+                 LEFT JOIN adres a ON r.reiziger_id = a.reiziger_id
+                 LEFT JOIN ov_chipkaart o ON r.reiziger_id = o.reiziger_id
+        WHERE r.reiziger_id = #{id};
+    </select>
+
+    <select id="findAll" resultMap="ReizigerWithAdresAndOVChipkaartResultMap">
+        SELECT r.reiziger_id AS id,
+               r.voorletters,
+               r.tussenvoegsel,
+               r.achternaam,
+               r.geboortedatum,
+               a.adres_id AS adres_id,
+               a.postcode,
+               a.huisnummer,
+               a.straat,
+               a.woonplaats,
+               o.kaart_nummer AS kaart_nummer,
+               o.geldig_tot AS geldig_tot,
+               o.klasse AS klasse,
+               o.saldo AS saldo,
+               o.reiziger_id AS reiziger_id
+        FROM reiziger r
+                 LEFT JOIN adres a ON r.reiziger_id = a.reiziger_id
+                 LEFT JOIN ov_chipkaart o ON r.reiziger_id = o.reiziger_id;
+    </select>
+
+    <select id="findByGbdatum" parameterType="java.sql.Date" resultType="Reiziger.Reiziger">
+        SELECT reiziger_id AS id, voorletters, tussenvoegsel, achternaam, geboortedatum
+        FROM reiziger
+        WHERE geboortedatum = #{date};
+    </select>
+</mapper>
